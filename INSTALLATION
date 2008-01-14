@@ -1,0 +1,13 @@
+Requirements
+X7CLOUD  requires php 5 or higher and has been tested up to php 5
+The webservice is compatible with apache/iis and above and in some cases requires some additional plug ins to work properly.
+
+New install: this is the first time you install x7 in your server
+
+   1. Download the framework zip file
+   2. Extract the contents of the zip file to your local hard drive
+   3. Open to the basic_example.php script.
+   4. Config the script as you wish.
+   5. Go to your webbrowser, open the script and add the Get query parameters basic_example.php?1111=0&0000=0 , press enter then you will see all example modules. 
+   6. Click en any module
+
