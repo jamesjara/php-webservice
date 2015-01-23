@@ -1,12 +1,24 @@
 <?php
-
-//Set namespace if is necesary
+// +---------------------------------------------------------------------------+
+// | This file part of X7CLOUD FRAMEWORK                                       |
+// | Copyright (c) 20011-2021 the X7CLOUD Project.                             |
+// | AUTOR: James Jara                                                         |
+// |                                                                           |
+// | For the full copyright and license information, please view the LICENSE   |
+// | file that was distributed with this source code. You can also view the    |
+// | LICENSE file online at http://x7cloud.blogspot.com/p/license.html         |
+// | LICENSE Atributivo-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)|
+// |   vi: set noexpandtab:                                                    |
+// |   Local Variables:                                                        |
+// |   indent-tabs-mode: t                                                     |
+// |   End:                                                                    |
+// +---------------------------------------------------------------------------+
 
 /**
  * @package    ws_x7cloud_034875
- * @notes writed in the competition 24 hours programing by JamesJara
- * @copyright  Copyright @JamesJara (c) 2010-2014 Grupo de Seguridad informatica Costa RIca. (http://gsi0.com/)
- * @license    LicenseUrl	LicenseName
+ * @notes writed in the competition 24 hours programing by JamesJara , JamesJara.com
+ * @copyright  Copyright @JamesJara (c) 2010-2021  
+ * @license    http://x7cloud.blogspot.com/p/license.html	Atributivo-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0) 
  */
 class ws_x7cloud_034875 {
 	
@@ -14,7 +26,7 @@ class ws_x7cloud_034875 {
     const log_info  = "Info";
     const log_error = "Error";
     const log_debug = "Debug";
-    const log_always= "Always";
+    const log_warning= "Warning";
 	
 	//=============1.Set variables==================
 	private 	static 	$instance;
@@ -25,7 +37,9 @@ class ws_x7cloud_034875 {
 	private 	$isGet 		= true, //Used to set method post or get
 				$var_module = 'm',  //Used to store the variable to get the modules
 				$var_verb 	= 'v',  //Used to store the variable to get the verbs 
-				$isValid	= true; //Used to store validation of variables
+				$isValid	= true, //Used to store validation of variables
+				$log_path   = null, //Used to store the X7CLOUD Logs.
+				$isLogging	= false; //Used to activate/deactive logging functions.
 	
 	//=============2.Set constructors==================
 	/**
@@ -56,15 +70,41 @@ class ws_x7cloud_034875 {
 	}
 	
 	/**
+	 * Set the folder to write the logs of x7cloud
+	 * 
+	 * @param String $value
+	 * @throws Exception if the path is not valid or writeable
+	 */
+	public function setLogPath($value ){
+		if(is_writeable( $value )) $this->log_path =  $value ; 
+		else throw new Exception( sprintf("Log path must be writeable.  \n invalid path: %s \n " , $value) );
+	}
+	
+	/**
+	 * 
+	 * Set the logging mode
+	 *
+	 * @param  boolean will loggin all information if set to true, else will not logging anything
+	 */
+	public function isLogging($value ){
+		$this->isLogging = (($value==true) ? true : false);
+	}
+	
+	/**
 	 * Function to print log information
 	 *
 	 * @param  $msg			Message to display
 	 * @param  $severity	The kind of Log 
 	 */
 	private function _log( $msg , $severity ) {
-		if( ($this->debug==true) or ( $severity == self::log_always) ) {
-			header('Content-type: text/plain');	
-			echo sprintf( "[%s]\t[%s][%s] : %s \n", $severity, date('c') , memory_get_peak_usage() ,  $msg );
+		//Errors msg will be always logged
+		if ($this->isLogging or ($severity==self::log_error) ){
+			$contenido = sprintf( "[%s]\t[%s][%s] : %s", $severity, date('c') , memory_get_peak_usage() ,  $msg );
+			if( ($this->debug==true) ) {
+				header('Content-Type: text/plain');	
+				echo  $contenido;
+			} 
+			$this->write_Log_msg( $contenido );
 		}
 	}
 	
@@ -73,11 +113,12 @@ class ws_x7cloud_034875 {
 	 *
 	 * @param  $msg		Message to write
 	 */
-	private function write_Log_error( $msg ){
-		$error_log_path = date('y_d_m').'.log';
-		if(!$this->writeToFile( $error_log_path, $msg."\n" , true )){
-			echo " CRITICAL ERROR Error writing log error. \n";
-			die();
+	private function write_Log_msg( $msg ){
+		//Check log path
+		if(is_null($this->log_path)) throw new Exception( 'Log path must be defined, see: setLogPath() . \n' );
+		$log_path = sprintf('%s/%s', $this->log_path , date('y_d_m').'.log' );
+		if(!$this->writeToFile( $log_path, $msg."\n" , true )){
+			throw new Exception( " CRITICAL ERROR, Error writing log error (check permissions). \n" );
 		}
 	}
 	
@@ -93,13 +134,11 @@ class ws_x7cloud_034875 {
 		if(is_writable(dirname($path))){
 			$handle = fopen( $path  , $mode);
 			if (!$handle){
-				$this->write_Log_error("Cant open the file $path ");
-				$this->_log("Cant open the file $path ", 'Error' );
+				$this->_log("Cant open the file $path ", self::log_error );
 				return false;
 			}
 			if (!fwrite($handle,$data)) {
-				$this->write_Log_error("Cannot write the file $path ");
-				$this->_log("Cannot write the file $path ", 'Error' );
+				$this->_log("Cannot write the file $path ", self::log_error );
 				exit; //in this case should stop the program
 			} else {
 				fclose( $handle );
@@ -108,8 +147,6 @@ class ws_x7cloud_034875 {
 		}
 	}
 	
-	
-
 	//=============4.Set OUR basic functions here==================
 	
 	/**
@@ -210,7 +247,7 @@ class ws_x7cloud_034875 {
 	public function dump(){
 		var_dump($this->core);
 	}	
-	public function showNice(){
+	public function showAPI(){
 		//Show modules
 		foreach( $this->core as $modulo ){
 			echo sprintf("New Module\tId:[%s]\tHint:[%s]\n",$modulo->id ,  $modulo->hint);
@@ -229,16 +266,15 @@ class ws_x7cloud_034875 {
 	 * @category utility
 	 * @param String $id variable id
 	 * @param Boolean $isGet set method true(GET) or false(POST) 
-	 * @param Boolean $requered if is requerid or not , (checking the data is safe).
+	 * @param Boolean $requered if is requerid or not , (checking the data ).
 	 * @param Const $filter check here http://uk3.php.net/manual/en/filter.filters.sanitize.php , (actually adjusting the data to make it safe*)
-	 * @return if is requerid and it doesnt exist return false, else will return a Mixed var(clean) 
+	 * @return if is requerid and it doesnt exist return false, else will return a Mixed var(clean)  
 	 */
 	public function setNewValue( $id ,  $isGet = true , $requered = false ,  $sanitisation  = FILTER_UNSAFE_RAW ){
-		$this->_log (' Validatin value' , self::log_debug);
-		
+		$this->_log (' Validating value' , self::log_debug);		
 		//Validate
 		if(empty($id)) 				throw new Exception(' Id var is requered ');
-		if(!is_int($sanitisation))  throw new Exception(' filter constants must be a sanitize constant ');//Todo fix this because could be passes a integer
+		if(!is_int($sanitisation))  throw new Exception(' filter constants must be a sanitize constant ');//TODO fix this because could be passes a integer
 		if(!is_bool($isGet)) 		throw new Exception(' isGet must be boolean , true/false ');
 		if(!is_bool($requered)) 	throw new Exception(' requered must be boolean , true/false');
 		
@@ -253,10 +289,13 @@ class ws_x7cloud_034875 {
 		
 		//Sanitisation
 		if ($sanitisation!==false) {
-			//todo detec if is a valid $sanitisation
+			//TODO detec if is a valid $sanitisation
 			$variable = filter_var( $variable , $sanitisation );			
 		}
 		
+		//If empty mean invalid data
+		if (!$variable) return false;
+			
 		return $variable;
 	}
 	
@@ -327,7 +366,7 @@ class ws_x7cloud_034875 {
 	 */
 	public function getSessionValue ( $value ) {
 		@session_start();
-		return isset($_SESSION[$var])   ?  $_SESSION[$var]      :  NULL;
+		return isset($_SESSION[$value])   ?  $_SESSION[$value]      :  NULL;
 	}
 
 	/**
@@ -359,7 +398,7 @@ class ws_x7cloud_034875 {
 	 * Destroy Session
 	 *
 	 * @category core
-	 * @param boolean $fast_destroy FOR NOT BE IN WHILE INFINITE OF HASSESION TIMEOUT FUNCTION
+	 * @param boolean $fast_destroy FOR NOT BE IN WHILE INFINITE OF HASSESION TIMEOUT FUNCTION TODO FIX THIS
 	 * @return true if the session is sucesfully destroyed
 	 */
 	public function  CloseSesion($fast_destroy = FALSE){
@@ -428,27 +467,32 @@ class ws_x7cloud_034875 {
 	 *
 	 * @category core
 	 * @param Mixed $data
+	 * @param String $template format for the response (json,xml,etc)
 	 * @param String $type headers type
-	 * @param String $format format for the response (json,xml,etc)
 	 * @param Array $extra_headers (if there is some header repeated will persevere the last header setted)
 	 * @return return the result in a custom format or null in case of error
 	 */
-	public function CloudResponse( $data , $type , $template  = 'default' , $extra_headers = null ){
-		//Custom functions to the set basic data templates
-		if ( ($data = $this->setTemplate( $template , $type , $data )) == false ) $this->_log (' Error ocurren in template  ' , self::log_error);
+	public function CloudResponse( $data ,  $template  = 'default' , $type = null , $extra_headers = null ){
+		//If there is not type use the template type
+		if(!$type) $type = $template;
 		//Set the data type
-		if ( $this->setType( $type ) == false )  						$this->_log (' Default Data Header Type not found ' , self::log_error);
-		//If extra headers is set, appened headers
+		if ( $this->setType( $type ) == false )  $this->_log (' Default Data Header Type not found ' , self::log_error);
+		//If extra headers is set, appened or REWRITE headers	
 		if (isset($extra_headers) && is_array($extra_headers)) {
 			foreach($extra_headers  as $key => $value){
-				//Especial headers FIX
+				//Especial headers TODO FIX
 				if(strtolower($key)=='_status')
 					header( sprintf('HTTP/1.1 %s', $value ) );
-				else			
-					header( sprintf('%s: %s', $key , $value ) );				
+				else {			
+					header_remove ( $key );
+					header( sprintf('%s: %s', $key , $value ) );	
+				}			
 			}
 			$this->_log (' custom headers added' , self::log_debug);
 		}
+		//Custom functions to the set basic data templates
+		$this->_log (' Printting data ' , self::log_debug);
+		if ( ($data = $this->setTemplate( $template , $type , $data )) == false ) $this->_log (' Error ocurren in template  ' , self::log_error);
 		//Print data
 		echo $data;
 	}
@@ -468,30 +512,25 @@ class ws_x7cloud_034875 {
 			case 'atom':
 				header('Content-type: application/atom+xml');	
 				break;
+			case 'rss':
+				header('Content-Type: application/rss+xml');	
+				break;
 			case 'css':
 				header('Content-type: text/css');	
 				break;
 			case 'js':
 				header('Content-type: text/javascript');	
 				break;
-			case 'IMAGE':
-				header('Content-type: image/jpeg');	
-				break;
 			case 'json':
 				header('Content-type: application/json');					
-				break;
-			case 'pdf':
-				header('Content-type: application/pdf');	
-				break;
-			case 'rss':
-				header('Content-Type: application/rss+xml; charset=ISO-8859-1');	
 				break;
 			case 'xml':
 				header('Content-type: text/xml');	
 				break;
-			case 'sound':				
-				$mime_type = "audio/mpeg, audio/x-mpeg, audio/x-mpeg-3, audio/mpeg3";
-				header("Content-type: {$mime_type}");				
+			case 'image':
+			case 'audio':
+			case 'pdf':
+				//For this 3 ignore
 				break;
 			case 'plain':
 				header('Content-type: text/plain');	
@@ -512,93 +551,44 @@ class ws_x7cloud_034875 {
 	 *
 	 * @category core
 	 * @param String $template template name
-	 * @param String $format data type
+	 * @param String $type data type
 	 * @param String $data array or string
 	 * @return return formated data on success or false on invalid data header
 	 */
-	private function setTemplate( $template , $format , $data){
-		//SET DEFAULT DATA FORMAT
-		switch ( strtolower( $format ) ){
-			case 'atom':
-				//ToDO
-				return $data;
-				break;
-			case 'css':
-				//ToDO
-				return $data;
-				break;
-			case 'js':
-				//ToDO
-				return $data;
-				break;
-			case 'image':
-				//ToDO			
-				if ( file_exists($data) ) {									
-					header('Content-Description: imagen');
-					header('Content-Type: image/'.pathinfo($data,PATHINFO_EXTENSION).'');
-					header(sprintf('Content-Disposition: filename="%s"', basename($data)));
-					header('Content-Transfer-Encoding: binary');
-					header('Expires: 0');
-					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-					header('Pragma: public');
-					header('Content-Length: ' . filesize($data));
-					ob_clean();
-					flush();
-					readfile($data);
-					exit;
+	private function setTemplate( $template , $type , $data){
+		$this->_log (' Setting data format '.$template , self::log_debug);
+		//SET  DATA FORMAT FOR SOME ESPECIAL CASES
+		switch ( strtolower( $template ) ){
+			case 'file':	
+				if ( file_exists($data) ) {	
+					$finfo = new finfo(FILEINFO_MIME);
+					$type = $finfo->file($data);
+					$mime = substr($type, 0, strpos($type, ';'));
+					header(sprintf('Content-Type:  %s',$mime));					
+					header('Content-Length: ' . filesize($data));		
+					ob_start();
+					readfile($data);	
+					exit; //just in case
 				} else { 
-					//ToDO improve this, show message or something ??? 
-					$data = null;
 					$this->_log (  sprintf(' file doenst exist  : %s  ',$data) , self::log_error); 
 					return null;
 				}
 				break;
 			case 'json':
-				//if is array
-				//return this->NewJson($data);
+				//TODO if is array
 				return json_encode($data);  
 				break;
-			case 'pdf':
-				//ToDO
-				return $data;
-				break;
-			case 'rss':
-				//ToDO
-				return $data;
-				break;
 			case 'xml':
-				//ToDO
+				//TODO
 				//Validate XML STRICT FORMAT
 				if(!is_array($data)or(empty($data))) { $this->_log (  sprintf(' Invalid XML FORMAT , array is requerid  : %s  ',$data) , self::log_error); exit; }
 				return $this->NewXml(NULL, NULL ,$data);           					
-				break;
-			case 'sound':			
-				if ( file_exists($data) ) {
-					header('Content-length: ' . filesize($data));
-					header(sprintf('Content-Disposition: filename="%s"', basename($data)));
-					header('X-Pad: avoid browser bug');
-					header('Cache-Control: no-cache');
-					$mime_type = "audio/mpeg, audio/x-mpeg, audio/x-mpeg-3, audio/mpeg3"; //Todo fix this, because this should be seted in the set page.
-					header("Content-type: {$mime_type}");					
-					readfile($data);
-					exit;
-				} else { 
-					//ToDO improve this, show message or something ??? 
-					$data = null;
-					$this->_log (  sprintf(' file doenst exist  : %s  ',$data) , self::log_error); 
-					return null;
-				}				
-				break;
-			case 'plain':
-				//ToDO
-				return $data ;
-				break;
-			default :
-				//ToDO
+				break;		
+			default 		:
+				//if pass to here is because doesnt need especial configuration
 				return $data;
 				break;
 		}
-		$this->_log (' Setting data format '.$format , self::log_debug);
 		return true;
 	}
 	
@@ -674,11 +664,11 @@ class ws_x7cloud_034875 {
 					, self::log_info);			
 			//Execute the CUSTOM FUNCTION
 			if( $this->core[$modulo]->verbs[$verbo]->SetFunction() == false ){
-				$this->_log( 'Please define a function for thuis ' , self::log_always);
+				$this->_log( 'Please define a function for thuis ' , self::log_error);
 				return false;				
 			}
 		} else
-			$this->_log( ' Module or verb does not exist ' , self::log_always);
+			$this->_log( ' Module or verb does not exist ' , self::log_warning);
 			return false;	
 	}	
 }
@@ -698,7 +688,7 @@ class modulo extends ws_x7cloud_034875 {
 	}
 	
 	public function __construct( ){
-		//Todo, remove parent variables
+		//TODO, remove parent variables
 		//unset( $this->verbs ); dont uncoment else will generate error
 		unset( $this->debug );
 		unset( $this->core );		
@@ -774,7 +764,5 @@ class verbo extends modulo {
 			return false;
 		}
 	}
-	
-	
-	
+
 }
