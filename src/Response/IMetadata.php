@@ -1,0 +1,41 @@
+<?php
+/**
+ * Interface for all metadata Classes
+ *
+ */
+namespace JamesJara\X7Cloud\Response;
+
+/**
+ * IMetadata for all metadata Classes
+ */
+interface IMetadata
+{
+
+    /**
+     * Register an new column
+     *
+     * @param string $id            
+     * @param string $title            
+     * @param string $type            
+     * @return void
+     */
+    public function addColumn($id, $title, $type);
+
+    /**
+     * alias function of metadata, with fancy name
+     *
+     * @alias metadata
+     *
+     * @param int $type            
+     * @return array
+     */
+    public function get($type);
+
+    /**
+     * Returns all set of metadata: columns, fields, root
+     *
+     * @param int $type            
+     * @return array
+     */
+    public function metadata($type);
+}

@@ -1,0 +1,14 @@
+<?php
+/**
+ * Abstract Metadata Class
+ *
+ */
+namespace JamesJara\X7Cloud\Response;
+
+/**
+ * AbstractMetadata for all frameworks
+ *
+ */
+class AbstractMetadata
+{
+}

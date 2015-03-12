@@ -1,0 +1,107 @@
+<?php
+/**
+ * Metadata for ExtJs Framework.
+ *
+ */
+
+namespace JamesJara\X7Cloud\Response\Metadata;
+
+use JamesJara\X7Cloud\Response\IMetadata;
+use JamesJara\X7Cloud\Response\AbstractMetadata;
+
+/**
+ * Metadata for ExtJs Framework.
+ *
+ * Custom Class for specific Metadata of ExtJs Sencha.
+ *
+ */
+class MetadataExt extends AbstractMetadata implements IMetadata
+{
+
+    /**
+     * Selected columns for the Active Record model
+     *
+     * @var array
+     */
+    private $ids = array();
+
+    /**
+     * Column model for GridPanel
+     *
+     * @var array
+     */
+    private $columns = array();
+
+    /**
+     * Fields model for DataStore
+     *
+     * @var array
+     */
+    private $fields = array();
+
+    /**
+     * Register an new column
+     *
+     * @param string $id
+     * @param string $title
+     * @param string $type
+     * @return void
+     */
+    public function addColumn($id, $title, $type)
+    {
+        array_push($this->ids, $id);
+
+        $fields = array();
+        $fields['name'] = $id;
+        $fields['type'] = $type;
+        array_push($this->fields, $fields);
+
+        $columns = array();
+        $columns['text'] = $title;
+        $columns['dataIndex'] = $id;
+        array_push($this->columns, $columns);
+    }
+
+    /**
+     * alias function of metadata, with fancy name
+     *
+     * @alias metadata
+     *
+     * @param int $type
+     * @return array
+     */
+    public function get($type)
+    {
+        return $this->metadata($type);
+    }
+
+    /**
+     * Returns all set of metadata: columns, fields, root
+     *
+     * @param int $type
+     * @return array
+     */
+    public function metadata($type)
+    {
+
+        // root data
+        if ($type == 0) {
+            $metadata = array();
+            $metadata['root'] = 'users';
+            $metadata['totalProperty'] = 'count';
+            $metadata['successProperty'] = 'ok';
+            $metadata['messageProperty'] = 'msg';
+
+            $metadata['fields'] = $this->fields;
+            $metadata['columns'] = $this->columns;
+
+            return $metadata;
+        } elseif ($type == 1) {
+
+            return $this->fields;
+        } elseif ($type == 2) {
+
+            return $this->ids;
+        }
+    }
+}

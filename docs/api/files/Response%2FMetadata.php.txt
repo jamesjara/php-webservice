@@ -1,0 +1,62 @@
+<?php
+namespace JamesJara\X7Cloud\Response;
+
+class Metadata
+{
+
+    private $ids = array();
+
+    private $columns = array();
+
+    private $fields = array();
+
+    function addColumn($id, $title, $type)
+    {
+        array_push($this->ids, $id);
+        
+        $fields = array();
+        $fields['name'] = $id;
+        $fields['type'] = $type;
+        array_push($this->fields, $fields);
+        
+        $columns = array();
+        $columns['text'] = $title;
+        $columns['dataIndex'] = $id;
+        array_push($this->columns, $columns);
+    }
+
+    function get($type)
+    {
+        return $this->metadata($type);
+    }
+
+    function metadata($type)
+    {
+        
+        // root data
+        if ($type == 0) {
+            $metadata = array();
+            $metadata['root'] = 'users';
+            $metadata['totalProperty'] = 'count';
+            $metadata['successProperty'] = 'ok';
+            $metadata['messageProperty'] = 'msg';
+            
+            $metadata['fields'] = $this->fields;
+            $metadata['columns'] = $this->columns;
+            
+            return $metadata;
+            
+            // fields
+        } elseif ($type == 1) {
+            
+            return $this->fields;
+            
+            // ids
+        } elseif ($type == 2) {
+            
+            return $this->ids;
+            
+            // just keys
+        }
+    }
+}

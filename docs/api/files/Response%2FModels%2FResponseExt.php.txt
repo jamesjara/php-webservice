@@ -1,0 +1,94 @@
+<?php
+/**
+ * Response for ExtJs Framework.
+ *
+ */
+namespace JamesJara\X7Cloud\Response\Models;
+
+use JamesJara\X7Cloud\Response\IResponse;
+use JamesJara\X7Cloud\Response\AbstractResponse;
+
+/**
+ * ResponseExt for ExtJs Framework.
+ *
+ * Custom Class for specific response of ExtJs Sencha.
+ *
+ */
+class ResponseExt extends AbstractResponse implements IResponse
+{
+
+    /**
+     * Returns response as json string fomratted to ExtJs Framework
+     *
+     * @return String
+     */
+    public function response()
+    {
+        $tmp = array();
+        $tmp['count'] = 1;
+        $tmp['ok'] = true;
+        $tmp['msg'] = "Users found";
+        $tmp['users'] = $this->data;
+        $tmp['metaData'] = $this->metadata;
+        return json_encode($tmp);
+    }
+
+    /**
+     * Set data for the response
+     *
+     * @return array
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * Sets metadata structure data
+     *
+     * @param array $data
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * Sets specific grid structure data
+     *
+     * @param array $data
+     */
+    public function setGridData($data)
+    {}
+
+    /**
+     * Sets specific form structure data
+     *
+     * @param array $data
+     */
+    public function setFormData($data)
+    {}
+
+    /**
+     * Sets response type
+     *
+     * @param int $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Set success type
+     *
+     * @param int $success
+     */
+    public function setSuccess($success)
+    {
+        $this->success = $success;
+    }
+}
+
+
+

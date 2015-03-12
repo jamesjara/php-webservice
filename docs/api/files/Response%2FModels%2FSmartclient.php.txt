@@ -1,0 +1,21 @@
+<?php
+namespace JamesJara\X7Cloud;
+
+class SmartclientResponse implements ResponseInterface
+{
+
+    public function response()
+    {}
+
+    public function setData($data)
+    {}
+
+    public function setMetadata($data)
+    {}
+
+    public function setGridData($data)
+    {}
+
+    public function setFormData($data)
+    {}
+}

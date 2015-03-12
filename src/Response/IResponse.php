@@ -1,0 +1,55 @@
+<?php
+/**
+ * Interface for all responses Classes
+ *
+ */
+namespace JamesJara\X7Cloud\Response;
+
+/**
+ * IResponse for all responses Classes
+ */
+interface IResponse
+{
+
+    /**
+     * Returns complete response as array
+     *
+     * @return array
+     */
+    public function response();
+
+    /**
+     * Sets data
+     *
+     * @param array $data            
+     */
+    public function setData($data);
+
+    /**
+     * Sets metadata structure data
+     *
+     * @param array $data            
+     */
+    public function setMetadata($data);
+
+    /**
+     * Sets specific grid structure data
+     *
+     * @param array $data            
+     */
+    public function setGridData($data);
+
+    /**
+     * Sets specific form structure data
+     *
+     * @param array $data            
+     */
+    public function setFormData($data);
+
+    /**
+     * Config if returns metadata configuration
+     *
+     * @param boolean $show            
+     */
+    public function showMetadata($showMetaData);
+}
