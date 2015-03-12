@@ -39,7 +39,7 @@ best way to use:
 
 
 eXAMPLE
-'''
+```
    // Load Core(active record)
    require_once __DIR__ . "/../../../core/load_core.php";
    use Illuminate\Database\Capsule\Manager as Capsule;
@@ -93,5 +93,5 @@ eXAMPLE
         return $response;
     }
    }
-'''
+```
  
