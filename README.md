@@ -40,13 +40,12 @@ best way to use:
 
 eXAMPLE
 '''
-   <?php
    // Load Core(active record)
-   require_once __DIR__ . '/../../../core/load_core.php';
+   require_once __DIR__ . "/../../../core/load_core.php";
    use Illuminate\Database\Capsule\Manager as Capsule;
    
    // Load Webservice Core
-   require_once __DIR__ . '/../../x7cloud/vendor/autoload.php';
+   require_once __DIR__ . "/../../x7cloud/vendor/autoload.php";
    use JamesJara\X7Cloud\X7Cloud;
    use JamesJara\X7Cloud\Response\Models\ResponseExt;
    
@@ -55,11 +54,11 @@ eXAMPLE
     public function __construct()
     {
         parent::__construct();
-        $this->prefix = "bt_";
+        $this->prefix = "x7_";
         $this->debug = true;
     }
     
-    protected function bt_users()
+    protected function x7_users()
     {
         $response = new ResponseExt();
         $response->setMetadata(Users::metadata());
