@@ -49,7 +49,7 @@ eXAMPLE
    use JamesJara\X7Cloud\X7Cloud;
    use JamesJara\X7Cloud\Response\Models\ResponseExt;
    
-   class BuildToolsApi extends X7Cloud
+   class MyCompanyApi extends X7Cloud
    {
     public function __construct()
     {
