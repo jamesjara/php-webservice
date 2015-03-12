@@ -40,18 +40,18 @@ best way to use:
 
 eXAMPLE
 '''
-<?php
-// Load Core(active record)
-require_once __DIR__ . '/../../../core/load_core.php';
-use Illuminate\Database\Capsule\Manager as Capsule;
-
-// Load Webservice Core
-require_once __DIR__ . '/../../x7cloud/vendor/autoload.php';
-use JamesJara\X7Cloud\X7Cloud;
-use JamesJara\X7Cloud\Response\Models\ResponseExt;
-
-class BuildToolsApi extends X7Cloud
-{
+   <?php
+   // Load Core(active record)
+   require_once __DIR__ . '/../../../core/load_core.php';
+   use Illuminate\Database\Capsule\Manager as Capsule;
+   
+   // Load Webservice Core
+   require_once __DIR__ . '/../../x7cloud/vendor/autoload.php';
+   use JamesJara\X7Cloud\X7Cloud;
+   use JamesJara\X7Cloud\Response\Models\ResponseExt;
+   
+   class BuildToolsApi extends X7Cloud
+   {
     public function __construct()
     {
         parent::__construct();
@@ -93,6 +93,6 @@ class BuildToolsApi extends X7Cloud
 
         return $response;
     }
- }
+   }
 '''
  
